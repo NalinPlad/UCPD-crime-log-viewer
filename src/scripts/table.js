@@ -1,4 +1,4 @@
-import { load, esc, shareBtn } from './data.js';
+import { load, esc, shareBtn, tags } from './data.js';
 
 const q = document.getElementById('q');
 const n = document.getElementById('n');
@@ -6,7 +6,8 @@ const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const LIMIT = 1000;
 const TIME_COLS = new Set(['Log date', 'Reported']);
-const WIDE = new Set(['Crime(s)', 'Notes', 'Location', 'Disposition', 'Flags', 'Geocode note']);
+const WIDE = new Set(['Crime(s)', 'Notes', 'Location', 'Disposition', 'Flags']);
+const HIDDEN = new Set(['Geocode note', 'Parse check']);
 
 let rows = [], fields = [], sortKey = 'Reported', dir = -1;
 
@@ -15,7 +16,7 @@ const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 function cell(r, f, hl) {
   let v = esc(r.raw[f]);
   if (hl) v = v.replace(hl, '<mark>$&</mark>');
-  if (f === 'Crime(s)') return `<i style="background:${r.color}"></i>${v}`;
+  if (f === 'Crime(s)') return `<i style="background:${r.color}"></i>${v}${tags(r)}`;
   if (f === 'Source file' && r.doc) return `<a href="${r.doc}" target="_blank" rel="noopener">${v}</a>`;
   return v;
 }
@@ -48,7 +49,7 @@ const shared = new URLSearchParams(location.search).get('case');
 if (shared) q.value = shared;
 
 load().then((d) => {
-  fields = d.fields;
+  fields = d.fields.filter((f) => !HIDDEN.has(f));
   rows = d.rows.map((r) => ({ ...r, text: fields.map((f) => r.raw[f]).join(' ').toLowerCase() }));
   sort();
 });

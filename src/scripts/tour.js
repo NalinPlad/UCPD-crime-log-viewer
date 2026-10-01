@@ -55,9 +55,9 @@ export function runTour(steps, { onEnd } = {}) {
     ], { duration: 520, easing: 'cubic-bezier(.55,0,.7,.2)', fill: 'forwards' }).finished.then(() => {
       hole.remove(); card.remove();
       help.animate([
-        { transform: 'translateY(-50%) rotate(-1.5deg) scale(1)' },
-        { transform: 'translateY(-50%) rotate(-1.5deg) scale(1.18)' },
-        { transform: 'translateY(-50%) rotate(-1.5deg) scale(1)' },
+        { transform: 'scale(1)' },
+        { transform: 'scale(1.18)' },
+        { transform: 'scale(1)' },
       ], { duration: 320, easing: 'ease-out' });
     });
   }

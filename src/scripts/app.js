@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { load, esc, fmt, hue, shareBtn, reportBtn } from './data.js';
+import { load, esc, fmt, hue, shareBtn, reportBtn, tags } from './data.js';
 import { runTour, tourSeen } from './tour.js';
 
 const HOUR = 3600e3;
@@ -129,9 +129,10 @@ load().then(({ rows }) => {
   incidents = rows.filter((i) => i.crime && isFinite(i.t)).sort((a, b) => b.t - a.t).map((i, idx) => {
     if (isFinite(i.lat) && isFinite(i.lng)) {
       i.m = L.circleMarker([i.lat, i.lng], { radius: 6, color: i.color, fillColor: i.color, fillOpacity: 0.75, weight: 1 });
-      const body = `<b>${esc(i.crime)}</b>${esc(i.loc)}<br><span>${esc(fmt(i.t))} · #${esc(i.case)}<br>${esc(i.disp)}</span>`;
-      i.m.bindTooltip(body, { className: 'tip', direction: 'top', offset: [0, -6] })
-        .bindPopup(`<div class="card">${body}<div class="acts">${reportBtn(i.doc)}${shareBtn(i.case)}</div></div>`, { className: 'pin', minWidth: 278, maxWidth: 278, offset: [0, -4] })
+      const body = `<b>${esc(i.crime)}</b>${tags(i)}${esc(i.loc)}<br><span>${esc(fmt(i.t))} · #${esc(i.case)}<br>${esc(i.disp)}</span>`;
+      const card = `<div class="card">${body}<div class="acts">${reportBtn(i.doc)}${shareBtn(i.case)}</div></div>`;
+      i.m.bindTooltip(card, { className: 'tip', direction: 'top', offset: [0, -6] })
+        .bindPopup(card, { className: 'pin', minWidth: 278, maxWidth: 278, offset: [0, -4] })
         .on('popupopen', () => i.m.closeTooltip())
         .on('tooltipopen', () => i.m.isPopupOpen() && i.m.closeTooltip());
     }
@@ -173,7 +174,7 @@ function startTour() {
     if (i) map.panInside(i.m.getLatLng(), { paddingTopLeft: [60, 120], paddingBottomRight: [380, 160], animate: false });
   };
   const steps = [
-    { target: dotWithCard, before: focusDot, text: 'Click any dot to pin its details. Hover for a quick look.' },
+    { target: dotWithCard, before: focusDot, text: 'Hover on a dot to see its details. Click to pin it.' },
     { target: () => band, before: () => map.closePopup(), text: 'Drag the orange band to move back in time.' },
     { target: () => handle, pad: 8, text: 'Pull its left edge to widen the time range.' },
     { target: () => document.getElementById('all'), text: 'Open the full sheet to search across every incident in our archive.' },

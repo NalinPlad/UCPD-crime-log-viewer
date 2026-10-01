@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+import STATUTES from './statutes.json';
 
 const BASE = 'https://docs.google.com/spreadsheets/d/1tib7sgkUmbr4M7MXzn78MzTENa0qXbjpGCCSszXBkLg';
 const SHEET = `${BASE}/gviz/tq?tqx=out:csv&sheet=Incidents`;
@@ -9,8 +10,28 @@ export const fmt = (t) => new Date(t).toLocaleString([], { month: 'short', day: 
 
 const LINK = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 013.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 014.5 9l1-1"/></svg>';
 const CHECK = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>';
-const EXT = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h4v4M13 3L7.5 8.5M11.5 9.5V13h-8.5V4.5H6.5"/></svg>';
+const ext = (n) => `<svg viewBox="0 0 16 16" width="${n}" height="${n}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h4v4M13 3L7.5 8.5M11.5 9.5V13h-8.5V4.5H6.5"/></svg>`;
+const EXT = ext(14);
 export const reportBtn = (doc) => (doc ? `<a class="share" href="${esc(doc)}" target="_blank" rel="noopener" title="Open report">${EXT}</a>` : '');
+// Crime(s) segments look like "10851(A): VC; Take Vehicle…" → statute key "VC 10851(A)".
+const STATUTE_KEYS = Object.fromEntries(Object.entries(STATUTES).map(([k, v]) => [k.toUpperCase(), [k, v]]));
+const statutesIn = (crime) => {
+  const found = new Map();
+  for (const seg of crime.split('|')) {
+    const m = seg.trim().match(/^\*?([^:]+):\s*([A-Z]{2})\b/i);
+    const hit = m && STATUTE_KEYS[`${m[2]} ${m[1].replace(/\s+/g, '')}`.toUpperCase()];
+    if (hit) found.set(hit[0], hit[1]);
+  }
+  return [...found];
+};
+
+// Badges and statute chips shown under an incident's crime, shared by map and sheet views.
+export const tags = (i) => {
+  const out = (i.vawa ? ['<abbr class="badge" title="Violence Against Women Act">VAWA</abbr>'] : [])
+    .concat(i.statutes.map(([k, url]) => `<a class="chip" href="${esc(url)}" target="_blank" rel="noopener">${esc(k)}${ext(10)}</a>`));
+  return out.length ? `<span class="tags">${out.join('')}</span>` : '';
+};
+
 export const shareBtn = (c) => (c ? `<button class="share" data-case="${esc(c)}" title="Copy link">${LINK}</button>` : '');
 
 // Delegated: any .share button copies a link to the sheet view filtered to its case #.
@@ -64,6 +85,8 @@ export async function load() {
       loc: r['Location'], case: r['Case #'] || '', disp: r['Disposition'],
       doc: links[(r['Source file'] || '').trim()],
       color: colorFor(crime),
+      vawa: /VAWA/i.test(r['Flags'] || ''),
+      statutes: statutesIn(crime),
     };
   }).filter((i) => i.crime || i.case);
   const latest = Math.max(...rows.map((i) => i.t).filter(isFinite));

@@ -12,7 +12,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
       * { box-sizing: border-box; }
       html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 12px/1.4 ui-sans-serif, system-ui, sans-serif; }
       body { display: flex; flex-direction: column; overflow: hidden; }
-      header { position: relative; background: #000; padding: 10px 96px 10px 16px; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      header { position: relative; background: #000; padding: 10px 16px; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       header a { color: var(--muted); text-decoration: none; }
       header a:hover { color: var(--fg); }
       header b a { color: var(--fg); }
@@ -20,25 +20,14 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
       .share { display: inline-grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; }
       .share:hover { background: #22252a; color: var(--fg); }
       .share.done { color: #6fd08c; }
-      /* Help: drawn like a swipe of yellow highlighter — ragged ends, uneven ink, a slight tilt. */
-      #help { position: absolute; right: 18px; top: 50%; transform: translateY(-50%) rotate(-1.5deg); isolation: isolate; padding: 3px 12px; color: #1a1600; font-weight: 600; font-size: 15px; text-decoration: none; cursor: pointer; }
-      #help::before, #help::after { content: ''; position: absolute; z-index: -1; pointer-events: none; }
-      #help::before {
-        inset: 2px -4px 1px -5px;
-        border-radius: 45% 30% 40% 25% / 60% 40% 70% 35%;
-        background:
-          repeating-linear-gradient(178deg, #fff3 0 1px, transparent 1px 4px),
-          linear-gradient(97deg, transparent 0.5%, #f7e23a 2.5%, #fff06b 14%, #fbe84a 50%, #fff27a 82%, #f3dc2c 96%, transparent 99%);
-        filter: saturate(1.1);
-        transition: filter .2s;
-      }
-      #help::after {
-        inset: 5px -1px 4px 2px;
-        border-radius: 30% 50% 35% 55% / 50% 60% 40% 50%;
-        background: linear-gradient(94deg, transparent 4%, #e9c90055 20%, transparent 45%, #e9c90044 70%, transparent 95%);
-        transform: rotate(0.8deg);
-      }
-      #help:hover::before { filter: saturate(1.25) brightness(1.06); }
+      .tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 5px 0 6px; }
+      .badge, .chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 6px; border-radius: 3px; font-size: 11px; line-height: 16px; font-weight: 500; white-space: nowrap; text-decoration: none; }
+      .badge { background: #c792ea22; color: #dcb8f7; border: 1px solid #c792ea55; letter-spacing: .04em; cursor: help; }
+      a.chip, .leaflet-container a.chip { color: var(--fg); border: 1px solid #3a3d42; background: #ffffff08; }
+      a.chip:hover, .leaflet-container a.chip:hover { border-color: #5a5e66; background: #ffffff12; }
+      .chip svg { color: var(--muted); }
+      header a#help { display: inline-block; padding: 0 5px; border-radius: 2px; background: #fbe84a; color: #1a1600; }
+      header a#help:hover { background: #fff27a; }
       .tour-hole { position: fixed; z-index: 3000; border-radius: 8px; box-shadow: 0 0 0 2px var(--band), 0 0 0 9999px #000a; pointer-events: none; transition: all .35s cubic-bezier(.3,.7,.2,1); }
       .dragging .tour-hole { opacity: 0; transition: opacity .15s; }
       .tour-card { position: fixed; z-index: 3001; width: 290px; padding: 14px 16px 12px; background: #17191c; border: 1px solid #3a3d42; border-radius: 6px; box-shadow: 0 10px 32px #000a; font-size: 14px; line-height: 1.5; transition: top .35s cubic-bezier(.3,.7,.2,1), left .35s cubic-bezier(.3,.7,.2,1); }
@@ -52,7 +41,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
     </style>
   </head>
   <body>
-    <header><b><a href={base}>UCPD Crime Log Viewer</a></b><i>|</i><a href="https://drive.google.com/drive/u/1/folders/1ih_EkE5rVPpV02A05baaV7_IihZUgJwO" target="_blank" rel="noopener">Archival Drive</a><i>|</i><a href="https://docs.google.com/spreadsheets/d/1tib7sgkUmbr4M7MXzn78MzTENa0qXbjpGCCSszXBkLg/edit?gid=1110217855#gid=1110217855" target="_blank" rel="noopener">Raw Data</a><div id="latest"></div><a id="help" href={`${base}#tour`}>Help</a></header>
+    <header><b><a href={base}>UCPD Crime Log Viewer</a></b><i>|</i><a href="https://drive.google.com/drive/u/1/folders/1ih_EkE5rVPpV02A05baaV7_IihZUgJwO" target="_blank" rel="noopener">Archival Drive</a><i>|</i><a href="https://docs.google.com/spreadsheets/d/1tib7sgkUmbr4M7MXzn78MzTENa0qXbjpGCCSszXBkLg/edit?gid=1110217855#gid=1110217855" target="_blank" rel="noopener">Raw Data</a><i>|</i><a id="help" href={`${base}#tour`}>Help</a><div id="latest"></div></header>
     <slot />
   </body>
 </html>
