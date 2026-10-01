@@ -1,5 +1,6 @@
 import L from 'leaflet';
 import { load, esc, fmt, hue, shareBtn, reportBtn } from './data.js';
+import { runTour, tourSeen } from './tour.js';
 
 const HOUR = 3600e3;
 
@@ -93,7 +94,13 @@ function drag(e, mode) {
     }
     render();
   };
-  const up = () => { removeEventListener('pointermove', move); removeEventListener('pointerup', up); };
+  // While dragging, drop the tour's spotlight so the timeline reads at full strength; re-aim it on release.
+  document.body.classList.add('dragging');
+  const up = () => {
+    removeEventListener('pointermove', move); removeEventListener('pointerup', up);
+    document.body.classList.remove('dragging');
+    touring?.place();
+  };
   addEventListener('pointermove', move);
   addEventListener('pointerup', up);
 }
@@ -117,8 +124,6 @@ list.addEventListener('click', (e) => {
   if (i.m) { map.flyTo(i.m.getLatLng(), Math.max(map.getZoom(), 17), { duration: 0.6 }); i.m.openPopup(); }
   else if (i.doc) window.open(i.doc, '_blank', 'noopener');
 });
-list.addEventListener('mouseover', (e) => { const i = itemAt(e); if (i?.m) i.m.openPopup(); });
-list.addEventListener('mouseout', (e) => { const i = itemAt(e); if (i?.m) i.m.closeTooltip(); });
 
 load().then(({ rows }) => {
   incidents = rows.filter((i) => i.crime && isFinite(i.t)).sort((a, b) => b.t - a.t).map((i, idx) => {
@@ -136,4 +141,52 @@ load().then(({ rows }) => {
   t0 = Math.min(...incidents.map((i) => i.t), now - 72 * HOUR) - 6 * HOUR; t1 = now;
   end = t1; start = end - 72 * HOUR;
   drawTrack(); render();
+  if (!tourSeen() || location.hash === '#tour') startTour();
 });
+
+const mapwrap = document.getElementById('mapwrap');
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let touring = null;
+
+function startTour() {
+  touring?.end();
+  history.replaceState(null, '', location.pathname + location.search);
+  const pick = () => shown.find((i) => i.m) || incidents.find((i) => i.m);
+  const dotRect = () => {
+    const i = pick();
+    if (!i) return null;
+    const p = map.latLngToContainerPoint(i.m.getLatLng()), r = mapwrap.getBoundingClientRect();
+    return new DOMRect(r.left + p.x - 9, r.top + p.y - 9, 18, 18);
+  };
+  // The dot, grown to cover its hover card or pinned popup when one is open.
+  const dotWithCard = () => {
+    const r = dotRect(), m = pick()?.m;
+    const el = m?.isPopupOpen() ? m.getPopup().getElement() : m?.getTooltip()?.isOpen() ? m.getTooltip().getElement() : null;
+    if (!r || !el) return r;
+    const c = el.getBoundingClientRect();
+    const x = Math.min(r.left, c.left), y = Math.min(r.top, c.top);
+    return new DOMRect(x, y, Math.max(r.right, c.right) - x, Math.max(r.bottom, c.bottom) - y);
+  };
+  const focusDot = () => {
+    map.closePopup();
+    const i = pick();
+    if (i) map.panInside(i.m.getLatLng(), { paddingTopLeft: [60, 120], paddingBottomRight: [380, 160], animate: false });
+  };
+  const steps = [
+    { target: dotWithCard, before: focusDot, text: 'Click any dot to pin its details. Hover for a quick look.' },
+    { target: () => band, before: () => map.closePopup(), text: 'Drag the orange band to move back in time.' },
+    { target: () => handle, pad: 8, text: 'Pull its left edge to widen the time range.' },
+    { target: () => document.getElementById('all'), text: 'Open the full sheet to search across every incident in our archive.' },
+    {
+      target: () => document.querySelector('.leaflet-popup .acts') || dotRect(),
+      before: async () => { focusDot(); pick()?.m.openPopup(); await sleep(300); },
+      text: 'These buttons let you share an incident, and open the original report in our archive.',
+    },
+  ];
+  const t = runTour(steps, { onEnd: () => { map.off('move', t.place).off('tooltipopen tooltipclose popupopen popupclose', replace); touring = null; } });
+  const replace = () => requestAnimationFrame(t.place);
+  map.on('move', t.place).on('tooltipopen tooltipclose popupopen popupclose', replace);
+  touring = t;
+}
+
+document.getElementById('help').addEventListener('click', (e) => { e.preventDefault(); if (incidents.length) startTour(); });
