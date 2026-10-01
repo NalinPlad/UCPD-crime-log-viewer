@@ -1,5 +1,6 @@
 ---
 const { title = 'UCPD Crime Log' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 <html lang="en">
   <head>
@@ -23,7 +24,7 @@ const { title = 'UCPD Crime Log' } = Astro.props;
     </style>
   </head>
   <body>
-    <header><b><a href={import.meta.env.BASE_URL}>UCPD Crime Log Viewer</a></b><i>|</i><a href="https://drive.google.com/drive/u/1/folders/1ih_EkE5rVPpV02A05baaV7_IihZUgJwO" target="_blank" rel="noopener">Archival Drive</a><i>|</i><a href="https://docs.google.com/spreadsheets/d/1tib7sgkUmbr4M7MXzn78MzTENa0qXbjpGCCSszXBkLg/edit?gid=1110217855#gid=1110217855" target="_blank" rel="noopener">Raw Data</a><div id="latest"></div></header>
+    <header><b><a href={base}>UCPD Crime Log Viewer</a></b><i>|</i><a href="https://drive.google.com/drive/u/1/folders/1ih_EkE5rVPpV02A05baaV7_IihZUgJwO" target="_blank" rel="noopener">Archival Drive</a><i>|</i><a href="https://docs.google.com/spreadsheets/d/1tib7sgkUmbr4M7MXzn78MzTENa0qXbjpGCCSszXBkLg/edit?gid=1110217855#gid=1110217855" target="_blank" rel="noopener">Raw Data</a><div id="latest"></div></header>
     <slot />
   </body>
 </html>

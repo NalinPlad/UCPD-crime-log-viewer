@@ -18,7 +18,7 @@ document.addEventListener('click', (e) => {
   const b = e.target.closest?.('.share');
   if (!b) return;
   e.stopPropagation();
-  const url = new URL(`${import.meta.env.BASE_URL}table?case=${encodeURIComponent(b.dataset.case)}`, location.origin);
+  const url = new URL(`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}table?case=${encodeURIComponent(b.dataset.case)}`, location.origin);
   navigator.clipboard.writeText(url.href).then(() => {
     b.innerHTML = CHECK;
     b.classList.add('done');
