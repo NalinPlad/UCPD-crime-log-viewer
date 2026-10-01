@@ -1,0 +1,26 @@
+---
+const { title = 'UCPD Crime Log' } = Astro.props;
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <style is:global>
+      :root { color-scheme: dark; --bg: #0e0f11; --fg: #d7d9dc; --muted: #6b7078; --line: #1d1f23; --band: #ff8a1f; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 12px/1.4 ui-sans-serif, system-ui, sans-serif; }
+      body { display: flex; flex-direction: column; overflow: hidden; }
+      header { background: #000; padding: 10px 16px; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      header a { color: var(--muted); text-decoration: none; }
+      header a:hover { color: var(--fg); }
+      header b a { color: var(--fg); }
+      header i { color: #3a3d42; font-style: normal; margin: 0 8px; }
+      #latest { color: var(--muted); font-size: 14px; min-height: 20px; }
+    </style>
+  </head>
+  <body>
+    <header><b><a href={import.meta.env.BASE_URL}>UCPD Crime Log Viewer</a></b><i>|</i><a href="https://drive.google.com/drive/u/1/folders/1ih_EkE5rVPpV02A05baaV7_IihZUgJwO" target="_blank" rel="noopener">Archival Drive</a><i>|</i><a href="https://docs.google.com/spreadsheets/d/1tib7sgkUmbr4M7MXzn78MzTENa0qXbjpGCCSszXBkLg/edit?gid=1110217855#gid=1110217855" target="_blank" rel="noopener">Raw Data</a><div id="latest"></div></header>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="UCPD Crime Log · All incidents">
+  <style is:global>
+    #bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+    #q { flex: 1; max-width: 520px; background: #16181b; border: 1px solid #2a2d32; border-radius: 4px; color: var(--fg); font: inherit; font-size: 14px; padding: 8px 10px; outline: none; }
+    #q:focus { border-color: #44484f; }
+    #n { color: var(--muted); font-variant-numeric: tabular-nums; }
+    #wrap { flex: 1; overflow: auto; }
+    table { border-collapse: collapse; font-size: 12.5px; }
+    th { position: sticky; top: 0; background: var(--bg); text-align: left; font-weight: 500; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid #2a2d32; cursor: pointer; white-space: nowrap; user-select: none; }
+    th:hover { color: var(--fg); }
+    td { padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
+    td.w { white-space: normal; min-width: 200px; max-width: 380px; }
+    tr:hover td { background: #131518; }
+    td a { color: #8ab4f8; text-decoration: none; }
+    td i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+    mark { background: #ff8a1f44; color: inherit; }
+  </style>
+  <div id="bar"><input id="q" type="search" placeholder="Search" autofocus /><span id="n"></span></div>
+  <div id="wrap"><table><thead></thead><tbody></tbody></table></div>
+  <script src="../scripts/table.js"></script>
+</Layout>

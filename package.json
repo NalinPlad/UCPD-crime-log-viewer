@@ -1,0 +1,7 @@
+{
+  "name": "ucpd-crime-log",
+  "type": "module",
+  "private": true,
+  "scripts": { "dev": "astro dev", "build": "astro build", "preview": "astro preview" },
+  "dependencies": { "astro": "^5", "leaflet": "^1.9.4", "papaparse": "^5.4.1" }
+}
