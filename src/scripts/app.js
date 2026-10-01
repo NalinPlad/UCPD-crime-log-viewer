@@ -4,7 +4,8 @@ import { runTour, tourSeen } from './tour.js';
 
 const HOUR = 3600e3;
 
-const map = L.map('map', { preferCanvas: true, zoomControl: false }).setView([37.8719, -122.2585], 15);
+// tolerance widens each 6px dot's hover/click area to 12px.
+const map = L.map('map', { renderer: L.canvas({ tolerance: 6 }), zoomControl: false }).setView([37.8719, -122.2585], 15);
 const esri = (n) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/${n}/MapServer/tile/{z}/{y}/{x}`, {
   attribution: '&copy; Esri', maxZoom: 20, maxNativeZoom: 16,
 }).addTo(map);
