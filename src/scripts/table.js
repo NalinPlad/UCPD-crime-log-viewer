@@ -1,4 +1,4 @@
-import { load, esc } from './data.js';
+import { load, esc, shareBtn } from './data.js';
 
 const q = document.getElementById('q');
 const n = document.getElementById('n');
@@ -25,13 +25,13 @@ function render() {
   const hits = terms.length ? rows.filter((r) => terms.every((t) => r.text.includes(t))) : rows;
   const hl = terms.length ? new RegExp(terms.map((t) => reEsc(esc(t))).join('|'), 'gi') : null;
   n.textContent = hits.length > LIMIT ? `${LIMIT} of ${hits.length}` : `${hits.length}`;
-  tbody.innerHTML = hits.slice(0, LIMIT).map((r) => `<tr>${fields.map((f) => `<td${WIDE.has(f) ? ' class="w"' : ''}>${cell(r, f, hl)}</td>`).join('')}</tr>`).join('');
+  tbody.innerHTML = hits.slice(0, LIMIT).map((r) => `<tr><td class="s">${shareBtn(r.case)}</td>${fields.map((f) => `<td${WIDE.has(f) ? ' class="w"' : ''}>${cell(r, f, hl)}</td>`).join('')}</tr>`).join('');
 }
 
 function sort() {
   const time = TIME_COLS.has(sortKey);
   rows.sort((a, b) => dir * (time ? (a.t || 0) - (b.t || 0) : String(a.raw[sortKey] ?? '').localeCompare(String(b.raw[sortKey] ?? ''), undefined, { numeric: true })));
-  thead.innerHTML = `<tr>${fields.map((f) => `<th data-f="${esc(f)}">${esc(f)}${f === sortKey ? (dir > 0 ? ' ↑' : ' ↓') : ''}</th>`).join('')}</tr>`;
+  thead.innerHTML = `<tr><th></th>${fields.map((f) => `<th data-f="${esc(f)}">${esc(f)}${f === sortKey ? (dir > 0 ? ' ↑' : ' ↓') : ''}</th>`).join('')}</tr>`;
   render();
 }
 
@@ -43,6 +43,9 @@ thead.addEventListener('click', (e) => {
   sort();
 });
 q.addEventListener('input', render);
+
+const shared = new URLSearchParams(location.search).get('case');
+if (shared) q.value = shared;
 
 load().then((d) => {
   fields = d.fields;

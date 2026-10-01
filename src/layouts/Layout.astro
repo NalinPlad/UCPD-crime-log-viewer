@@ -16,6 +16,9 @@ const { title = 'UCPD Crime Log' } = Astro.props;
       header a:hover { color: var(--fg); }
       header b a { color: var(--fg); }
       header i { color: #3a3d42; font-style: normal; margin: 0 8px; }
+      .share { display: inline-grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; }
+      .share:hover { background: #22252a; color: var(--fg); }
+      .share.done { color: #6fd08c; }
       #latest { color: var(--muted); font-size: 14px; min-height: 20px; }
     </style>
   </head>

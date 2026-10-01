@@ -12,6 +12,9 @@ import Layout from '../layouts/Layout.astro';
     th { position: sticky; top: 0; background: var(--bg); text-align: left; font-weight: 500; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid #2a2d32; cursor: pointer; white-space: nowrap; user-select: none; }
     th:hover { color: var(--fg); }
     td { padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
+    td.s { padding: 3px 0 0 6px; }
+    td.s .share { opacity: 0; }
+    tr:hover td.s .share, td.s .share.done { opacity: 1; }
     td.w { white-space: normal; min-width: 200px; max-width: 380px; }
     tr:hover td { background: #131518; }
     td a { color: #8ab4f8; text-decoration: none; }

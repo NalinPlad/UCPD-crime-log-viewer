@@ -8,11 +8,13 @@ import Layout from '../layouts/Layout.astro';
     aside { position: absolute; top: 10px; right: 10px; bottom: 10px; z-index: 600; width: 300px; display: flex; flex-direction: column; overflow: hidden; background: #0e0f11ee; border: 1px solid #2a2d32; border-radius: 6px; box-shadow: 0 8px 28px #0009; backdrop-filter: blur(6px); }
     #count { padding: 10px 14px; color: var(--muted); border-bottom: 1px solid var(--line); }
     #list { flex: 1; overflow-y: auto; }
-    #list div { display: grid; grid-template-columns: 8px 1fr; gap: 0 10px; padding: 9px 14px; border-bottom: 1px solid var(--line); cursor: pointer; }
+    #list div { display: grid; grid-template-columns: 8px 1fr 26px; gap: 0 10px; padding: 9px 14px; border-bottom: 1px solid var(--line); cursor: pointer; }
     #list div:hover { background: #16181b; }
     #list i { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; }
     #list b { font-weight: 500; font-size: 13px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
     #list span { grid-column: 2; color: var(--muted); }
+    #list .share { grid-column: 3; grid-row: 1 / 3; align-self: center; opacity: 0; }
+    #list div:hover .share, #list .share.done { opacity: 1; }
     #list .nomap i { background: none !important; box-shadow: inset 0 0 0 1px var(--muted); }
     #all { display: block; margin: 10px; flex: none; padding: 9px; text-align: center; border: 1px solid #2a2d32; border-radius: 4px; color: var(--fg); text-decoration: none; }
     #all:hover { background: #16181b; }
@@ -27,8 +29,16 @@ import Layout from '../layouts/Layout.astro';
     #handle::after { content: ''; position: absolute; left: 3px; top: 30%; bottom: 30%; width: 4px; border-radius: 2px; background: var(--band); }
     .leaflet-tooltip.tip { background: #17191c; color: var(--fg); border: 1px solid #2a2d32; border-radius: 4px; box-shadow: 0 6px 24px #0008; padding: 12px 14px; width: 306px; max-width: 90vw; white-space: normal; font-size: 12.75px; line-height: 1.5; }
     .leaflet-tooltip.tip::before { display: none; }
-    .tip b { display: block; margin-bottom: 5px; font-size: 14.5px; line-height: 1.3; }
-    .tip span { color: var(--muted); }
+    .leaflet-popup.pin .leaflet-popup-content-wrapper { background: #17191c; color: var(--fg); border: 1px solid #3a3d42; border-radius: 4px; box-shadow: 0 6px 24px #0008; padding: 0; }
+    .leaflet-popup.pin .leaflet-popup-tip { background: #17191c; border: 1px solid #3a3d42; }
+    .leaflet-popup.pin .leaflet-popup-content { margin: 12px 14px; font-size: 12.75px; line-height: 1.5; }
+    .leaflet-popup.pin a.leaflet-popup-close-button { color: var(--muted); top: 4px; right: 4px; }
+    .tip b, .card b { display: block; margin-bottom: 5px; padding-right: 14px; font-size: 14.5px; line-height: 1.3; }
+    .tip span, .card span { color: var(--muted); }
+    .acts { display: flex; gap: 4px; margin: 8px -6px -4px; }
+    .acts .share { width: 30px; height: 30px; }
+    .leaflet-container .acts a.share { color: var(--muted); }
+    .leaflet-container .acts a.share:hover { color: var(--fg); }
     .leaflet-interactive { cursor: pointer; }
     .leaflet-container:focus, .leaflet-interactive:focus { outline: none; }
     .leaflet-control-attribution { background: #0e0f11aa !important; color: var(--muted) !important; }

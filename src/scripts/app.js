@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { load, esc, fmt, hue } from './data.js';
+import { load, esc, fmt, hue, shareBtn, reportBtn } from './data.js';
 
 const HOUR = 3600e3;
 
@@ -37,7 +37,7 @@ function render() {
   if (key !== listKey) {
     listKey = key;
     countEl.textContent = `${shown.length} incident${shown.length === 1 ? '' : 's'}`;
-    list.innerHTML = shown.map((i, k) => `<div data-k="${k}"${i.m ? '' : ' class="nomap"'}><i style="background:${i.color}"></i><b>${esc(i.crime)}</b><span>${esc(i.loc)} · ${esc(fmt(i.t))}</span></div>`).join('');
+    list.innerHTML = shown.map((i, k) => `<div data-k="${k}"${i.m ? '' : ' class="nomap"'}><i style="background:${i.color}"></i><b>${esc(i.crime)}</b><span>${esc(i.loc)} · ${esc(fmt(i.t))}</span>${shareBtn(i.case)}</div>`).join('');
   }
   const w = tl.clientWidth;
   const x = (t) => ((t - t0) / (t1 - t0)) * w;
@@ -114,18 +114,21 @@ const itemAt = (e) => shown[e.target.closest('[data-k]')?.dataset.k];
 list.addEventListener('click', (e) => {
   const i = itemAt(e);
   if (!i) return;
-  if (i.m) { map.flyTo(i.m.getLatLng(), Math.max(map.getZoom(), 17), { duration: 0.6 }); i.m.openTooltip(); }
+  if (i.m) { map.flyTo(i.m.getLatLng(), Math.max(map.getZoom(), 17), { duration: 0.6 }); i.m.openPopup(); }
   else if (i.doc) window.open(i.doc, '_blank', 'noopener');
 });
-list.addEventListener('mouseover', (e) => { const i = itemAt(e); if (i?.m) i.m.openTooltip(); });
+list.addEventListener('mouseover', (e) => { const i = itemAt(e); if (i?.m) i.m.openPopup(); });
 list.addEventListener('mouseout', (e) => { const i = itemAt(e); if (i?.m) i.m.closeTooltip(); });
 
 load().then(({ rows }) => {
   incidents = rows.filter((i) => i.crime && isFinite(i.t)).sort((a, b) => b.t - a.t).map((i, idx) => {
     if (isFinite(i.lat) && isFinite(i.lng)) {
-      i.m = L.circleMarker([i.lat, i.lng], { radius: 6, color: i.color, fillColor: i.color, fillOpacity: 0.75, weight: 1 })
-        .bindTooltip(`<b>${esc(i.crime)}</b>${esc(i.loc)}<br><span>${esc(fmt(i.t))} · #${esc(i.case)}<br>${esc(i.disp)}</span>`, { className: 'tip', direction: 'top', offset: [0, -6] });
-      if (i.doc) i.m.on('click', () => window.open(i.doc, '_blank', 'noopener'));
+      i.m = L.circleMarker([i.lat, i.lng], { radius: 6, color: i.color, fillColor: i.color, fillOpacity: 0.75, weight: 1 });
+      const body = `<b>${esc(i.crime)}</b>${esc(i.loc)}<br><span>${esc(fmt(i.t))} · #${esc(i.case)}<br>${esc(i.disp)}</span>`;
+      i.m.bindTooltip(body, { className: 'tip', direction: 'top', offset: [0, -6] })
+        .bindPopup(`<div class="card">${body}<div class="acts">${reportBtn(i.doc)}${shareBtn(i.case)}</div></div>`, { className: 'pin', minWidth: 278, maxWidth: 278, offset: [0, -4] })
+        .on('popupopen', () => i.m.closeTooltip())
+        .on('tooltipopen', () => i.m.isPopupOpen() && i.m.closeTooltip());
     }
     return Object.assign(i, { idx });
   });
